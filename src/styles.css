@@ -1,0 +1,169 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-lens: var(--lens);
+  --color-conf-primary: var(--conf-primary);
+  --color-conf-scholarly: var(--conf-scholarly);
+  --color-conf-reference: var(--conf-reference);
+  --color-conf-web: var(--conf-web);
+  --color-sidebar: var(--sidebar);
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Newsreader", "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --shadow-border: var(--shadow-border);
+  --shadow-border-hover: var(--shadow-border-hover);
+}
+
+:root {
+  --background: #f3efe6;
+  --foreground: #1c1a16;
+  --card: #faf7f0;
+  --card-foreground: #1c1a16;
+  --popover: #fffcf6;
+  --popover-foreground: #1c1a16;
+  --primary: #2f3a34;
+  --primary-foreground: #f4f0e6;
+  --secondary: #e8e2d4;
+  --secondary-foreground: #2a2722;
+  --muted: #e7e1d4;
+  --muted-foreground: #6b655b;
+  --accent: #e8e2d4;
+  --accent-foreground: #2a2722;
+  --destructive: #9b3d32;
+  --destructive-foreground: #faf7f0;
+  --border: #d8d0c0;
+  --input: #d8d0c0;
+  --ring: #2f3a34;
+  --paper: #fffcf6;
+  --ink: #1c1a16;
+  --lens: #5d6b5e;
+  --conf-primary: #3f6d52;
+  --conf-scholarly: #3d5d78;
+  --conf-reference: #8a6d2e;
+  --conf-web: #a35d38;
+  --sidebar: #ebe6dc;
+  --radius: 0.75rem;
+  --shadow-border:
+    0px 0px 0px 1px rgba(28, 26, 22, 0.06),
+    0px 1px 2px -1px rgba(28, 26, 22, 0.06),
+    0px 2px 4px 0px rgba(28, 26, 22, 0.04);
+  --shadow-border-hover:
+    0px 0px 0px 1px rgba(28, 26, 22, 0.1),
+    0px 1px 2px -1px rgba(28, 26, 22, 0.08),
+    0px 2px 6px 0px rgba(28, 26, 22, 0.06);
+}
+
+.dark {
+  --background: #121314;
+  --foreground: #ece8e1;
+  --card: #1a1c1e;
+  --card-foreground: #ece8e1;
+  --popover: #1f2224;
+  --popover-foreground: #ece8e1;
+  --primary: #d5cfc3;
+  --primary-foreground: #161513;
+  --secondary: #232628;
+  --secondary-foreground: #ece8e1;
+  --muted: #26282b;
+  --muted-foreground: #a39e95;
+  --accent: #232628;
+  --accent-foreground: #ece8e1;
+  --destructive: #d07064;
+  --destructive-foreground: #1a1c1e;
+  --border: #2e3236;
+  --input: #2e3236;
+  --ring: #d5cfc3;
+  --paper: #181a1c;
+  --ink: #ece8e1;
+  --lens: #8d9a88;
+  --conf-primary: #6fa37f;
+  --conf-scholarly: #6d92b3;
+  --conf-reference: #c4a35a;
+  --conf-web: #d08962;
+  --sidebar: #161819;
+  --shadow-border: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --shadow-border-hover: 0 0 0 1px rgba(255, 255, 255, 0.13);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--background);
+    color: var(--foreground);
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    min-height: 100dvh;
+  }
+
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+    font-family: var(--font-serif);
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--lens) 35%, transparent);
+  }
+}
+
+@utility source-prose {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

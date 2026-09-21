@@ -1,0 +1,1 @@
+import{j as e}from"./index-BXV7PP4q.js";var t=e(`loader-circle`,[[`path`,{d:`M21 12a9 9 0 1 1-6.219-8.56`,key:`13zald`}]]);function n(e){return{provider:e?.aiProvider??`xai`,geminiApiKey:e?.geminiApiKey||void 0,geminiModel:e?.geminiModel||void 0}}export{t as n,n as t};

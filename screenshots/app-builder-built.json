@@ -1,0 +1,38 @@
+{
+  "url": "http://127.0.0.1:8081/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "MannaNote",
+      "hasCanvas": false,
+      "bodyTextLen": 760,
+      "bodyTextHash": "9d10492a4e09cbbbd0c7b9b5cdb07d8999a35596f185ffc44515ee7428cce621",
+      "bodyTextPrefix": "MANNANOTE Where do you stand when you read? Choose a primary int",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "MannaNote",
+      "hasCanvas": false,
+      "bodyTextLen": 760,
+      "bodyTextHash": "9d10492a4e09cbbbd0c7b9b5cdb07d8999a35596f185ffc44515ee7428cce621",
+      "bodyTextPrefix": "MANNANOTE Where do you stand when you read? Choose a primary int",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-built.json",
+  "divergesFromBaseline": false,
+  "baselineReasons": []
+}
