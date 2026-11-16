@@ -2,9 +2,27 @@
  * Provider-agnostic completion used by the MannaNote server functions.
  *
  * Default: xAI grok-4.5 via the platform-injected XAI_API_KEY (server-only).
- * Optional: the user's own Gemini key, stored locally and passed per request.
+ * Optional: the user's own Gemini key, stored locally and passed per request,
+ * or a server-side GEMINI_API_KEY / GOOGLE_API_KEY env var.
+ *
+ * Fallback order:
+ *  - provider "xai": XAI_API_KEY, else Gemini (user key, then server key)
+ *  - provider "gemini": user key, then server key, else XAI_API_KEY
+ * When nothing is configured a single clear error explains what to add.
  * Never log keys. Never send them back to the client.
  */
+import { normalizeGeminiModel } from "./gemini-models.ts";
+
+export const NO_AI_PROVIDER_ERROR =
+  "No AI provider is configured. Add a Google AI Studio (Gemini) key in Settings, or set GEMINI_API_KEY or XAI_API_KEY on the server.";
+
+export function serverGeminiKey(): string {
+  return (
+    process.env.GEMINI_API_KEY?.trim() ||
+    process.env.GOOGLE_API_KEY?.trim() ||
+    ""
+  );
+}
 
 export type CompletionInput = {
   system: string;
@@ -101,21 +119,14 @@ export async function completeJson(
   input: CompletionInput,
 ): Promise<CompletionResult> {
   const maxTokens = input.maxTokens ?? 3500;
-  if (input.provider === "gemini") {
-    const key = input.geminiApiKey?.trim();
-    if (!key) {
-      return {
-        ok: false,
-        error: "Add a Google AI Studio key in Settings to use Gemini.",
-      };
-    }
-    return completeGemini(
-      input.system,
-      input.user,
-      maxTokens,
-      key,
-      input.geminiModel?.trim() || "gemini-2.0-flash",
-    );
+  const xaiKey = process.env.XAI_API_KEY?.trim() || "";
+  const geminiKey = input.geminiApiKey?.trim() || serverGeminiKey();
+  const model = normalizeGeminiModel(input.geminiModel);
+
+  const useGemini = input.provider === "gemini" ? Boolean(geminiKey) || !xaiKey : !xaiKey;
+  if (useGemini) {
+    if (!geminiKey) return { ok: false, error: NO_AI_PROVIDER_ERROR };
+    return completeGemini(input.system, input.user, maxTokens, geminiKey, model);
   }
   return completeXai(input.system, input.user, maxTokens);
 }

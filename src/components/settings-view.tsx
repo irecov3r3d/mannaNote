@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { fetchAiStatus } from "@/lib/ai/server";
+import { DEFAULT_GEMINI_MODEL, normalizeGeminiModel } from "@/lib/ai/gemini-models";
 import { clearVault, getDb, updatePreferences } from "@/lib/manna/db";
 import { LENS_FAMILIES } from "@/lib/manna/lenses";
 import { loadSampleLibrary } from "@/lib/manna/vault";
@@ -14,19 +15,25 @@ import { cn } from "@/lib/utils";
 export function SettingsView() {
   const prefs = useLiveQuery(() => getDb().preferences.get("main"), []);
   const [xai, setXai] = useState<boolean | null>(null);
+  const [geminiServer, setGeminiServer] = useState(false);
   const [geminiKey, setGeminiKey] = useState("");
-  const [geminiModel, setGeminiModel] = useState("gemini-2.0-flash");
+  const [geminiModel, setGeminiModel] = useState(DEFAULT_GEMINI_MODEL);
   const [customLabel, setCustomLabel] = useState("");
   const [confirmClear, setConfirmClear] = useState(false);
 
   useEffect(() => {
-    fetchAiStatus().then((s) => setXai(s.xai)).catch(() => setXai(false));
+    fetchAiStatus()
+      .then((s) => {
+        setXai(s.xai);
+        setGeminiServer(Boolean(s.geminiServer));
+      })
+      .catch(() => setXai(false));
   }, []);
 
   useEffect(() => {
     if (!prefs) return;
     setGeminiKey(prefs.geminiApiKey);
-    setGeminiModel(prefs.geminiModel);
+    setGeminiModel(normalizeGeminiModel(prefs.geminiModel));
     setCustomLabel(prefs.activeLens.customLabel ?? "");
   }, [prefs]);
 
@@ -141,6 +148,16 @@ export function SettingsView() {
           Grok status:{" "}
           {xai == null ? "checking…" : xai ? "available" : "unavailable in this environment"}
         </p>
+        {xai === false && !prefs.geminiApiKey && !geminiServer ? (
+          <p className="text-xs text-destructive">
+            No AI provider is set up. Add a Google AI Studio key below to turn on
+            analysis, comparisons and overviews.
+          </p>
+        ) : xai === false ? (
+          <p className="text-xs text-muted-foreground">
+            Grok is unavailable here, so MannaNote uses Gemini automatically.
+          </p>
+        ) : null}
         <div className="flex gap-2">
           {(["xai", "gemini"] as AiProvider[]).map((p) => (
             <button
@@ -165,7 +182,7 @@ export function SettingsView() {
             value={geminiKey}
             onChange={(e) => setGeminiKey(e.target.value)}
             onBlur={() => void updatePreferences({ geminiApiKey: geminiKey.trim() })}
-            placeholder="Only needed if you select Gemini"
+            placeholder="Needed for Gemini, or when Grok is unavailable"
           />
         </div>
         <div className="space-y-1.5">
@@ -176,7 +193,7 @@ export function SettingsView() {
             onChange={(e) => setGeminiModel(e.target.value)}
             onBlur={() =>
               void updatePreferences({
-                geminiModel: geminiModel.trim() || "gemini-2.0-flash",
+                geminiModel: normalizeGeminiModel(geminiModel),
               })
             }
           />

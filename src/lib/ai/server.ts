@@ -101,7 +101,11 @@ async function runComplete(
 
 export const fetchAiStatus = createServerFn({ method: "POST" }).handler(
   async () => {
-    return { xai: Boolean(process.env.XAI_API_KEY) };
+    const { serverGeminiKey } = await import("./complete.server.ts");
+    return {
+      xai: Boolean(process.env.XAI_API_KEY),
+      geminiServer: Boolean(serverGeminiKey()),
+    };
   },
 );
 
