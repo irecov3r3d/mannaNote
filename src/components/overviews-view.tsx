@@ -196,7 +196,7 @@ export function OverviewsView() {
   const [audio, setAudio] = useState<AudioOverviewData | null>(null);
   const [length, setLength] = useState<"short" | "standard">("short");
 
-  const list = sources ?? [];
+  const list = useMemo(() => sources ?? [], [sources]);
 
   useEffect(() => {
     if (picked.length === 0) {

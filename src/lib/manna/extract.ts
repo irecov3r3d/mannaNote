@@ -1,15 +1,23 @@
+function safeCodePoint(n: number): string {
+  if (!Number.isFinite(n) || n < 0 || n > 0x10ffff) return "";
+  try {
+    return String.fromCodePoint(n);
+  } catch {
+    return "";
+  }
+}
+
 function decodeEntities(html: string): string {
   return html
     .replace(/&nbsp;/gi, " ")
-    .replace(/&/gi, "&")
-    .replace(/</gi, "<")
-    .replace(/>/gi, ">")
-    .replace(/"/gi, '"')
-    .replace(/&#39;/gi, "'")
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, n) =>
-      String.fromCharCode(parseInt(n, 16)),
-    );
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&#(\d+);/g, (_, n) => safeCodePoint(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => safeCodePoint(parseInt(n, 16)))
+    // &amp; last so "&amp;lt;" decodes to the literal text "&lt;".
+    .replace(/&amp;/gi, "&");
 }
 
 export function stripMarkup(html: string): string {
@@ -20,9 +28,9 @@ export function stripMarkup(html: string): string {
     .replace(/<\/(p|div|h[1-6]|li|tr|blockquote)>/gi, "\n\n")
     .replace(/<[^>]+>/g, " ");
   return decodeEntities(without)
-    .replace(/[ \t]+\n/g, "\n")
-    .replace(/\n{3,}/g, "\n\n")
     .replace(/[ \t]{2,}/g, " ")
+    .replace(/[ \t]*\n[ \t]*/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
 
@@ -135,7 +143,7 @@ export async function extractFromFile(file: File): Promise<ExtractedDoc> {
   const text =
     lower.endsWith(".html") || lower.endsWith(".htm") || mime.includes("html")
       ? stripMarkup(raw)
-      : raw.replace(/\u0000/g, "").trim();
+      : raw.replaceAll("\u0000", "").trim();
   if (!text) throw new Error("That file appears to be empty.");
   return { title, text, mime, filename };
 }

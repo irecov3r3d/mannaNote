@@ -18,6 +18,10 @@ import type {
   SourceRecord,
 } from "./types";
 import { DEFAULT_LENS } from "./lenses";
+import {
+  DEFAULT_GEMINI_MODEL,
+  normalizeGeminiModel,
+} from "@/lib/ai/gemini-models";
 
 export class MannaDB extends Dexie {
   sources!: Table<SourceRecord, string>;
@@ -57,13 +61,22 @@ export const DEFAULT_PREFS: Preferences = {
   onboardingComplete: false,
   aiProvider: "xai",
   geminiApiKey: "",
-  geminiModel: "gemini-2.0-flash",
+  geminiModel: DEFAULT_GEMINI_MODEL,
 };
 
 export async function ensurePreferences(): Promise<Preferences> {
   const db = getDb();
   const existing = await db.preferences.get("main");
-  if (existing) return existing;
+  if (existing) {
+    // Migrate saved prefs off retired Gemini models (e.g. gemini-2.0-flash).
+    const model = normalizeGeminiModel(existing.geminiModel);
+    if (model !== existing.geminiModel) {
+      const migrated = { ...existing, geminiModel: model };
+      await db.preferences.put(migrated);
+      return migrated;
+    }
+    return existing;
+  }
   await db.preferences.put(DEFAULT_PREFS);
   return DEFAULT_PREFS;
 }
